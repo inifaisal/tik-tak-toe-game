@@ -1,64 +1,144 @@
 import React, { useEffect, useState } from 'react'
 import GridItem from './GridItem'
+import GameWinnerOverlay from './GameWinnerOverlay'
 
 const GameGrid = () => {
-  const [user, setUser] = useState([]);
-  const [apponent, setApponent] = useState([]);
+  const initialItems =  Array(9).fill('');
   const [isUserTurn, setIsUserTurn] = useState(true);
+  const [items, setItems] = useState(initialItems);
+  const [winner, setWinner] = useState(null);
 
   const handleOnSelectItem = (item) => {
-    if(isUserTurn) {
-      setUser([...user, item])
-    } else {
-      setApponent([...apponent, item])
+    const itemList = items;
+    if(!winner) {
+      if(isUserTurn) {
+        itemList.splice(item, 1, 'x')
+        setItems(itemList)
+      } else {
+        itemList.splice(item, 1, 'o')
+        setItems(itemList)
+      }
+
+      setIsUserTurn(prevState => !prevState);
     }
-    setIsUserTurn(prevState => !prevState);
+
   };
 
-  const getItemText = (index) => {
-    const userSelectedItem = user.some(item => {
-      return item === index
-    });
-
-    if(userSelectedItem) {
-      return 'x'
+  // win colum 012 345 789
+  const column = (item) => {
+    const isSelected = item !== ""
+    if(items[0] === item
+      && items[1] === item
+      && items[2] === item
+      && isSelected ) {
+        setWinner(item)
+    }
+    if(items[3] === item
+      && items[4] === item
+      && items[5] === item
+      && isSelected ) {
+        setWinner(item)
     }
 
-    const apponentSelectedItem = apponent.some(item => {
-      return item === index
-    });
-
-    if(apponentSelectedItem) {
-      return 'o'
+    if(items[6] === item
+      && items[7] === item
+      && items[8] === item
+      && isSelected ) {
+        setWinner(item)
     }
   }
 
-  const checkGameStatus = () => {
-    console.log(user.toString())
-    if(user.toString() === '0,1,2') {
-
+   // win row 036 147 258
+  const row = (item) => {
+    const isSelected = item !== ""
+    if(items[0] === item
+      && items[3] === item
+      && items[6] === item
+      && isSelected ) {
+        setWinner(item)
     }
+    if(items[1] === item
+      && items[4] === item
+      && items[7] === item
+      && isSelected ) {
+        setWinner(item)
+    }
+
+    if(items[2] === item
+      && items[5] === item
+      && items[8] === item
+      && isSelected ) {
+        setWinner(item)
+    }
+  }
+
+   // win diagonal 048 246
+  const diagonal = (item) => {
+    const isSelected = item !== ""
+    if(items[0] === item
+      && items[4] === item
+      && items[8] === item
+      && isSelected ) {
+        setWinner(item)
+    }
+    if(items[2] === item
+      && items[4] === item
+      && items[6] === item
+      && isSelected ) {
+        setWinner(item)
+    }
+  }
+
+
+  const checkGameStatus = () => {
+    items.forEach((item) => {
+      if(!winner) {
+        column(item);
+        row(item);
+        diagonal(item)
+      }
+    })
+
   };
 
-  useEffect(checkGameStatus, [user, apponent]);
+  useEffect(checkGameStatus, [
+    items,
+    winner,
+    isUserTurn
+  ]);
 
-  const items = Array(9).fill(0);
+  const handlePlayAgin = () => {
+    setItems(initialItems);
+    setWinner(null);
+    setIsUserTurn(true);
+  }
 
   return (
-    <div data-testid="test-app-container" className='game-grid'>
+    <div className='game-container'>
       {
-       items.map((_, index) => (
-          <GridItem
-            key={index}
-            onSelectItem={handleOnSelectItem}
-            gridId={index}
-            text={getItemText(index)}
+        winner && (
+          <GameWinnerOverlay
+            winner={winner}
+            onPlayAgain={handlePlayAgin}
           />
-        ))
+        )
       }
-
+      <div
+        data-testid="test-app-container" className='game-grid'
+      >
+        {
+          items.map((item, index) => (
+            <GridItem
+              key={index}
+              onSelectItem={handleOnSelectItem}
+              gridId={index}
+              text={item}
+            />
+          ))
+        }
+      </div>
     </div>
   )
 }
 
-export default GameGrid
+export default GameGrid;

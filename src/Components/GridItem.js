@@ -2,14 +2,17 @@ import React from 'react'
 
 const GridItem = (props) => {
   const {
-    text = "",
+    text,
     onSelectItem,
     gridId
   } = props;
 
   const handleOnSelect = () => {
-    onSelectItem(gridId)
+    if(text === "") {
+      onSelectItem(gridId)
+    }
   }
+
   return (
     <div
       data-testid="grid-item"
@@ -25,4 +28,4 @@ const GridItem = (props) => {
   )
 }
 
-export default GridItem
+export default GridItem;
