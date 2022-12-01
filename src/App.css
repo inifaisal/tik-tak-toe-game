@@ -18,6 +18,10 @@
   margin: 20px auto;
 }
 
+.game-turn-info {
+  text-align: right;
+}
+
 .game-grid {
   display: grid;
   grid-template-columns: repeat(3, 2fr);

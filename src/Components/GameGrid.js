@@ -7,6 +7,7 @@ const GameGrid = () => {
   const [isUserTurn, setIsUserTurn] = useState(true);
   const [items, setItems] = useState(initialItems);
   const [winner, setWinner] = useState(null);
+  const [isDraw, setIsDraw] = useState(false);
 
   const handleOnSelectItem = (item) => {
     const itemList = items;
@@ -18,7 +19,6 @@ const GameGrid = () => {
         itemList.splice(item, 1, 'o')
         setItems(itemList)
       }
-
       setIsUserTurn(prevState => !prevState);
     }
 
@@ -91,14 +91,21 @@ const GameGrid = () => {
 
 
   const checkGameStatus = () => {
+
     items.forEach((item) => {
       if(!winner) {
         column(item);
         row(item);
         diagonal(item)
       }
-    })
+    });
+    const allItemSelected = items
+      .filter(item => item === "")
+      .length === 0;
 
+    if(allItemSelected && !winner) {
+      setIsDraw(true);
+    }
   };
 
   useEffect(checkGameStatus, [
@@ -111,14 +118,21 @@ const GameGrid = () => {
     setItems(initialItems);
     setWinner(null);
     setIsUserTurn(true);
+    setIsDraw(false);
   }
+
+  const isGameOver = !!winner || isDraw;
 
   return (
     <div className='game-container'>
+      <div className="game-turn-info">
+        <h3>{isUserTurn ? "x" : "o"} Turn</h3>
+      </div>
       {
-        winner && (
+        isGameOver && (
           <GameWinnerOverlay
             winner={winner}
+            isDraw={isDraw}
             onPlayAgain={handlePlayAgin}
           />
         )
