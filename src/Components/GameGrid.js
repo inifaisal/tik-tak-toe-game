@@ -7,7 +7,7 @@ const GameGrid = () => {
   const [isUserTurn, setIsUserTurn] = useState(true);
   const [items, setItems] = useState(initialItems);
   const [winner, setWinner] = useState(null);
-  const [isDraw, setIsDraw] = useState(false);
+  const [isGridFull, setIsGridFull] = useState(false);
 
   const handleOnSelectItem = (item) => {
     const itemList = items;
@@ -89,9 +89,7 @@ const GameGrid = () => {
     }
   }
 
-
   const checkGameStatus = () => {
-
     items.forEach((item) => {
       if(!winner) {
         column(item);
@@ -103,8 +101,8 @@ const GameGrid = () => {
       .filter(item => item === "")
       .length === 0;
 
-    if(allItemSelected && !winner) {
-      setIsDraw(true);
+    if(allItemSelected) {
+      setIsGridFull(true);
     }
   };
 
@@ -118,10 +116,11 @@ const GameGrid = () => {
     setItems(initialItems);
     setWinner(null);
     setIsUserTurn(true);
-    setIsDraw(false);
+    setIsGridFull(false);
   }
 
-  const isGameOver = !!winner || isDraw;
+  const isGameOver = !!winner || isGridFull;
+  const isDraw = !winner && isGridFull;
 
   return (
     <div className='game-container'>
